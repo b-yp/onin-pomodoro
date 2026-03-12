@@ -1,0 +1,17 @@
+{
+  "id": "com.pomodoro.timer",
+  "name": "番茄钟",
+  "version": "0.1.0",
+  "description": "专注工作的番茄计时器，支持专注 / 休息阶段切换、系统通知、历史记录",
+  "entry": "dist/index.html",
+  "icon": "icon.png",
+  "type": "webview",
+  "lifecycle": "lifecycle.js",
+  "permissions": {
+    "scheduler": {
+      "enable": true
+    }
+  },
+  "devMode": true,
+  "devServer": "http://localhost:5173"
+}

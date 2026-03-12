@@ -1,0 +1,5 @@
+node_modules/
+dist/
+lifecycle.js
+.DS_Store
+*.local
