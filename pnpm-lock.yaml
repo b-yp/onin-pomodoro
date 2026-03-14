@@ -12,8 +12,8 @@ importers:
         specifier: ^2.10.1
         version: 2.10.1
       onin-sdk:
-        specifier: link:/Users/byp/Desktop/byp/repositories/Onin/packages/sdk
-        version: link:../../Onin/packages/sdk
+        specifier: ^1.5.2
+        version: 1.5.2(@tauri-apps/api@2.10.1)
       phosphor-svelte:
         specifier: ^3.1.0
         version: 3.1.0(svelte@5.53.6)(vite@7.3.1)
@@ -1275,6 +1275,11 @@ packages:
   onetime@6.0.0:
     resolution: {integrity: sha512-1FlR+gjXK7X+AsAHso35MnyN5KqGwJRi/31ft6x0M194ht7S+rWAvd7PHss9xSKMzE0asv1pyIHaJYq+BbacAQ==}
     engines: {node: '>=12'}
+
+  onin-sdk@1.5.2:
+    resolution: {integrity: sha512-Ynegvuvx/trtvHYg4FfZ+hFvkyHOplm1ns7OsL8+v7veTuGO8cGgHmqXoMc/xj+rpUwyKNGQRhfT1LNRFSifXQ==}
+    peerDependencies:
+      '@tauri-apps/api': ^2.0.0
 
   p-each-series@3.0.0:
     resolution: {integrity: sha512-lastgtAdoH9YaLyDa5i5z64q+kzOcQHsQ5SsZJD3q0VEyI8mq872S3geuNbRUQLVAE9siMfgKrpj7MloKFHruw==}
@@ -2839,6 +2844,10 @@ snapshots:
   onetime@6.0.0:
     dependencies:
       mimic-fn: 4.0.0
+
+  onin-sdk@1.5.2(@tauri-apps/api@2.10.1):
+    dependencies:
+      '@tauri-apps/api': 2.10.1
 
   p-each-series@3.0.0: {}
 

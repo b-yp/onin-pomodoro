@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@tauri-apps/api": "^2.10.1",
-    "onin-sdk": "link:/Users/byp/Desktop/byp/repositories/Onin/packages/sdk",
+    "onin-sdk": "^1.5.2",
     "phosphor-svelte": "^3.1.0"
   },
   "devDependencies": {
