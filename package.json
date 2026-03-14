@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "@tauri-apps/api": "^2.10.1",
-    "onin-sdk": "link:/Users/byp/Desktop/byp/repositories/Onin/packages/sdk"
+    "onin-sdk": "link:/Users/byp/Desktop/byp/repositories/Onin/packages/sdk",
+    "phosphor-svelte": "^3.1.0"
   },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",

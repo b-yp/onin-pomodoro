@@ -1,7 +1,15 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { timer, getPhaseColor } from "./lib/timer.svelte";
+  import { timer } from "./lib/timer.svelte";
   import type { Phase } from "./lib/timer.svelte";
+  import { 
+    TimerIcon, 
+    ChartBarIcon, 
+    PlayIcon, 
+    PauseIcon, 
+    ArrowCounterClockwiseIcon, 
+    SkipForwardIcon 
+  } from "phosphor-svelte";
 
   // Tab
   let activeTab = $state<"timer" | "history">("timer");
@@ -65,14 +73,16 @@
       class:active={activeTab === "timer"}
       onclick={() => (activeTab = "timer")}
     >
-      🍅 计时器
+      <TimerIcon size={16} weight={activeTab === 'timer' ? 'fill' : 'regular'} />
+      计时器
     </button>
     <button
       class="tab-btn"
       class:active={activeTab === "history"}
       onclick={() => (activeTab = "history")}
     >
-      📊 历史记录
+      <ChartBarIcon size={16} weight={activeTab === 'history' ? 'fill' : 'regular'} />
+      历史记录
     </button>
   </nav>
 
@@ -143,29 +153,14 @@
           onclick={() => timer.reset()}
           title="重置"
         >
-          <svg
-            viewBox="0 0 24 24"
-            width="18"
-            height="18"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M1 4v6h6" />
-            <path d="M3.51 15a9 9 0 1 0 .492-3.354" />
-          </svg>
+          <ArrowCounterClockwiseIcon size={20} />
         </button>
 
         <button class="ctrl-btn primary" onclick={handlePlay}>
           {#if timer.isRunning}
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-              <rect x="6" y="4" width="4" height="16" />
-              <rect x="14" y="4" width="4" height="16" />
-            </svg>
+            <PauseIcon size={32} weight="fill" />
           {:else}
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-              <polygon points="5,3 19,12 5,21" />
-            </svg>
+            <PlayIcon size={32} weight="fill" />
           {/if}
         </button>
 
@@ -174,17 +169,7 @@
           onclick={() => timer.skip()}
           title="跳过"
         >
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-            <polygon points="5,4 15,12 5,20" />
-            <line
-              x1="19"
-              y1="4"
-              x2="19"
-              y2="20"
-              stroke="currentColor"
-              stroke-width="2"
-            />
-          </svg>
+          <SkipForwardIcon size={20} />
         </button>
       </div>
 
@@ -299,6 +284,10 @@
     font-weight: 500;
     transition: all 0.2s;
     font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
   }
 
   .tab-btn:hover {
