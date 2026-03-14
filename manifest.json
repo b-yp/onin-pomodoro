@@ -10,6 +10,12 @@
   "permissions": {
     "scheduler": {
       "enable": true
+    },
+    "storage": {
+      "enable": true
+    },
+    "notification": {
+      "enable": true
     }
   },
   "devMode": true,
