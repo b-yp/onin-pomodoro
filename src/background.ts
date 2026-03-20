@@ -1,5 +1,5 @@
 /**
- * lifecycle.ts - 独立编译为 lifecycle.js，由 Onin 在插件加载时执行
+ * background.ts - 独立编译为 background.js，由 Onin 在插件加载时执行
  * 负责注册 settings schema 和 command handler
  */
 import { lifecycle, settings, type SettingField } from "onin-sdk";

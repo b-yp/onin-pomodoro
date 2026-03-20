@@ -1,5 +1,5 @@
 node_modules/
 dist/
-lifecycle.js
+background.js
 .DS_Store
 *.local
