@@ -7,9 +7,9 @@
     "dev": "vite",
     "check": "tsc --noEmit",
     "build:web": "vite build",
-    "build:background": "vite build --config vite.background.config.js",
-    "dev:background": "vite build --config vite.background.config.js --outDir . --watch",
-    "build": "pnpm run check && pnpm run build:web && pnpm run build:background",
+    "build:bg": "vite build --config vite.background.config.js",
+    "dev:bg": "vite build --config vite.background.config.js --outDir .",
+    "build": "pnpm run check && pnpm run build:web && pnpm run build:bg",
     "preview": "vite preview"
   },
   "dependencies": {
