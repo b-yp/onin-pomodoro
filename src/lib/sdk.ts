@@ -2,6 +2,7 @@
  * SDK 封装：settings 注册、通知、历史记录存取
  */
 import { settings, notification, storage, scheduler } from "onin-sdk";
+import type { SettingField } from "onin-sdk";
 export { scheduler };
 
 export interface PomodoroSettings {
@@ -20,18 +21,66 @@ export const DEFAULT_SETTINGS: PomodoroSettings = {
   autoStart: false,
 };
 
+export const SETTINGS_SCHEMA: SettingField[] = [
+  {
+    key: "focusDuration",
+    label: "专注时长（分钟）",
+    type: "number",
+    description: "每个番茄的专注时长，默认 25 分钟",
+    defaultValue: 25,
+  },
+  {
+    key: "shortBreak",
+    label: "短休息时长（分钟）",
+    type: "number",
+    description: "完成一个番茄后的短休息，默认 5 分钟",
+    defaultValue: 5,
+  },
+  {
+    key: "longBreak",
+    label: "长休息时长（分钟）",
+    type: "number",
+    description: "每隔几个番茄后的长休息，默认 15 分钟",
+    defaultValue: 15,
+  },
+  {
+    key: "longBreakInterval",
+    label: "长休息间隔（个番茄数）",
+    type: "number",
+    description: "每完成几个番茄进行一次长休息，默认 4 个",
+    defaultValue: 4,
+  },
+  {
+    key: "autoStart",
+    label: "自动开始下一阶段",
+    type: "switch",
+    description: "阶段结束后自动开始下一阶段，默认关闭",
+    defaultValue: false,
+  },
+];
+
+let schemaRegistered = false;
+
 /** 读取插件设置，缺失时用默认值填充 */
 export async function loadSettings(): Promise<PomodoroSettings> {
+  if (!schemaRegistered) {
+    await settings.useSettingsSchema(SETTINGS_SCHEMA);
+    schemaRegistered = true;
+  }
   const vals = await settings.getAll<Partial<PomodoroSettings>>();
   return {
     focusDuration: Number(
       vals?.focusDuration ?? DEFAULT_SETTINGS.focusDuration,
-    ),
-    shortBreak: Number(vals?.shortBreak ?? DEFAULT_SETTINGS.shortBreak),
-    longBreak: Number(vals?.longBreak ?? DEFAULT_SETTINGS.longBreak),
+    ) || DEFAULT_SETTINGS.focusDuration,
+    shortBreak: Number(
+      vals?.shortBreak ?? DEFAULT_SETTINGS.shortBreak,
+    ) || DEFAULT_SETTINGS.shortBreak,
+    longBreak: Number(
+      vals?.longBreak ?? DEFAULT_SETTINGS.longBreak,
+    ) || DEFAULT_SETTINGS.longBreak,
     longBreakInterval: Number(
       vals?.longBreakInterval ?? DEFAULT_SETTINGS.longBreakInterval,
-    ),
+    ) || DEFAULT_SETTINGS.longBreakInterval,
     autoStart: Boolean(vals?.autoStart ?? DEFAULT_SETTINGS.autoStart),
   };
 }
