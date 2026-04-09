@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/b-yp/onin-pomodoro/compare/v1.0.0...v1.1.0) (2026-04-09)
+
+
+### Features
+
+* add refactor release rule and manifest version sync ([5d8d3ef](https://github.com/b-yp/onin-pomodoro/commit/5d8d3efbae9786c6360ee87d935ccdcc7ab06091))
+
 # 1.0.0 (2026-03-22)
 
 
