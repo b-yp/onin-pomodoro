@@ -59,6 +59,7 @@ class TimerStore {
 
   private _intervalId: ReturnType<typeof setInterval> | null = null;
   private _isRestoring = false;
+  private _isCompleting = false;
 
   // ---------- 初始化 ----------
 
@@ -235,40 +236,70 @@ class TimerStore {
   }
 
   private async _onPhaseComplete(isRestored = false) {
-    this.pause();
-    this.remainingSeconds = 0;
+    if (this._isCompleting) return;
+    this._isCompleting = true;
 
-    if (this.phase === "focus") {
-      this.completedCount += 1;
+    try {
+      console.log(`[Timer] Phase complete triggered: ${this.phase}${isRestored ? ' (Restored)' : ''}`);
+      
+      const finishedPhase = this.phase;
+      this.pause();
+      this.remainingSeconds = 0;
 
-      const hist = await incrementToday();
-      this.history = hist;
-      const today = getTodayStr();
-      this.todayCount = hist.find((r) => r.date === today)?.count ?? 0;
-
-      if (!isRestored) {
-        await sendNotification(
-          "🍅 专注完成！",
-          `已完成第 ${this.todayCount} 个番茄，该休息了`,
-        );
+      // 1. 立即决定并切换到下一个阶段，保证 UI 响应
+      let nextPhase: Phase = "focus";
+      if (finishedPhase === "focus") {
+        this.completedCount += 1;
+        const interval = this.cfg?.longBreakInterval ?? 4;
+        nextPhase = this.completedCount % interval === 0 ? "long-break" : "short-break";
       }
-
-      const interval = this.cfg?.longBreakInterval ?? 4;
-      const nextPhase: Phase =
-        this.completedCount % interval === 0 ? "long-break" : "short-break";
+      
+      // 注意：setPhase 内部也会调用 pause() 和 _saveState()
       this.setPhase(nextPhase);
+      console.log(`[Timer] Switched to next phase: ${nextPhase}`);
 
-      if (this.cfg?.autoStart && !isRestored) {
-        setTimeout(() => this.start(), 500);
-      }
-    } else {
-      if (!isRestored) {
-        await sendNotification("⏰ 休息结束！", "准备好了吗？开始下一个专注阶段");
-      }
-      this.setPhase("focus");
-      if (this.cfg?.autoStart && !isRestored) {
-        setTimeout(() => this.start(), 500);
-      }
+      // 2. 异步执行耗时/可能阻塞的操作（历史记录和通知）
+      const runAsyncTasks = async () => {
+        try {
+          if (finishedPhase === "focus") {
+            const hist = await incrementToday();
+            this.history = hist;
+            const today = getTodayStr();
+            this.todayCount = hist.find((r) => r.date === today)?.count ?? 0;
+
+            if (!isRestored) {
+              // 不再 await 通知，防止因权限/手势/系统弹窗导致的阻塞
+              sendNotification(
+                "🍅 专注完成！",
+                `已完成第 ${this.todayCount} 个番茄，该休息了`,
+              ).catch(err => console.error("[Timer] Notification error:", err));
+            }
+          } else {
+            if (!isRestored) {
+              sendNotification("⏰ 休息结束！", "准备好了吗？开始下一个专注阶段")
+                .catch(err => console.error("[Timer] Notification error:", err));
+            }
+          }
+
+          // 如果开启了自动开始，也在这里处理
+          if (this.cfg?.autoStart && !isRestored) {
+            setTimeout(() => {
+              if (!this.isRunning) {
+                console.log("[Timer] Auto-starting next phase...");
+                this.start();
+              }
+            }, 1000);
+          }
+        } catch (e) {
+          console.error("[Timer] Error in background tasks:", e);
+        }
+      };
+
+      runAsyncTasks();
+    } catch (e) {
+      console.error("[Timer] Critical error in _onPhaseComplete:", e);
+    } finally {
+      this._isCompleting = false;
     }
   }
 }
