@@ -12,6 +12,7 @@ import {
   scheduler
 } from "./sdk";
 import type { PomodoroSettings, DailyRecord } from "./sdk";
+import { pluginWindow } from "onin-sdk";
 
 export type Phase = "focus" | "short-break" | "long-break";
 
@@ -66,42 +67,71 @@ class TimerStore {
     const s = await loadSettings();
     this.cfg = s;
 
-    const hist = await loadHistory();
-    this.history = hist;
+    try {
+      const hist = await loadHistory();
+      this.history = hist;
 
-    const today = getTodayStr();
-    const todayRecord = hist.find((r) => r.date === today);
-    this.todayCount = todayRecord?.count ?? 0;
+      const today = getTodayStr();
+      const todayRecord = hist.find((r) => r.date === today);
+      this.todayCount = todayRecord?.count ?? 0;
+    } catch (e) {
+      console.error("[Timer] Failed to load history:", e);
+    }
 
-    const savedState = await loadTimerState();
-    if (savedState) {
-      this.phase = savedState.phase as Phase;
-      const dur = this._phaseDuration(this.phase);
-      this.totalSeconds = dur * 60;
-      this.completedCount = savedState.completedCount ?? 0;
+    try {
+      const savedState = await loadTimerState();
+      if (savedState) {
+        this.phase = savedState.phase as Phase;
+        const dur = this._phaseDuration(this.phase);
+        this.totalSeconds = dur * 60;
+        this.completedCount = savedState.completedCount ?? 0;
 
-      if (savedState.isRunning && savedState.expectedEndTime) {
-        const now = Date.now();
-        if (now >= savedState.expectedEndTime) {
-          this.remainingSeconds = 0;
-          this.expectedEndTime = null;
-          await this._onPhaseComplete(true);
+        if (savedState.isRunning && savedState.expectedEndTime) {
+          const now = Date.now();
+          if (now >= savedState.expectedEndTime) {
+            this.remainingSeconds = 0;
+            this.expectedEndTime = null;
+            await this._onPhaseComplete(true);
+          } else {
+            this.remainingSeconds = Math.ceil((savedState.expectedEndTime - now) / 1000);
+            this.expectedEndTime = savedState.expectedEndTime;
+            this.isRunning = true;
+            this._startInterval();
+            this._registerScheduler();
+          }
         } else {
-          this.remainingSeconds = Math.ceil((savedState.expectedEndTime - now) / 1000);
-          this.expectedEndTime = savedState.expectedEndTime;
-          this.isRunning = true;
-          this._startInterval();
-          this._registerScheduler();
+          // 如果计时器未运行，直接应用当前阶段配置的时长。
+          // 这样可以确保修改设置后，初始进入界面能立即看到新时长，而不是旧的剩余时间。
+          this.remainingSeconds = this.totalSeconds;
+          this.isRunning = false;
+          this.expectedEndTime = null;
         }
       } else {
-        this.remainingSeconds = savedState.remainingSeconds;
-        this.isRunning = false;
-        this.expectedEndTime = null;
+        this.setPhase("focus");
       }
-    } else {
+    } catch (e) {
+      console.error("[Timer] Failed to load timer state:", e);
       this.setPhase("focus");
     }
     this._isRestoring = false;
+
+    // 监听窗口焦点，重新加载设置
+    pluginWindow.onFocus(async () => {
+      await this._reloadSettings();
+    });
+  }
+
+  /** 重新加载设置，更新当前阶段时间 */
+  private async _reloadSettings() {
+    const s = await loadSettings();
+    this.cfg = s;
+    // 如果计时器未运行，更新当前阶段的时间
+    if (!this.isRunning) {
+      const dur = this._phaseDuration(this.phase);
+      this.totalSeconds = dur * 60;
+      this.remainingSeconds = dur * 60;
+      this._saveState();
+    }
   }
 
   // ---------- 控制 ----------
