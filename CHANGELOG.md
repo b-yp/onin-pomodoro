@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/b-yp/onin-pomodoro/compare/v1.1.0...v1.1.1) (2026-04-09)
+
+
+### Bug Fixes
+
+* resolve non-automatic phase switching and blocking notification ([6ce53cc](https://github.com/b-yp/onin-pomodoro/commit/6ce53cc57edc561f281444c9437856b8c0564c71))
+
 # [1.1.0](https://github.com/b-yp/onin-pomodoro/compare/v1.0.0...v1.1.0) (2026-04-09)
 
 
